@@ -19,7 +19,6 @@ void loop() {
   static UltrasonicSensor ultrasonic(7, 8, DistUnit::CENTIMETERS);
 
   if (unitToggle.isToggled()) {
-    Serial.println("Toggled");
     unitIndex = (unitIndex + 1) % 3;
     switch (unitIndex) {
     case 0:
