@@ -19,6 +19,7 @@ private:
   long m_lastDebounce;
   int m_switchState;
   bool m_toggleState;
+  int m_lastState;
 
   void begin();
   bool canToggle(int thisState) const;
@@ -126,25 +127,25 @@ bool Toggle::canToggle(int thisState) const {
 
 Toggle::Toggle(uint8_t pin)
     : m_pin(pin), m_toggleState(false), m_lastDebounce(millis()),
-      m_debounceDelay(0), m_switchWhen(ToggleWhen::high) {
+      m_debounceDelay(0), m_switchWhen(ToggleWhen::high), m_lastState(LOW) {
   begin();
 }
 
 Toggle::Toggle(uint8_t pin, ToggleWhen switchWhen)
     : m_pin(pin), m_toggleState(false), m_lastDebounce(millis()),
-      m_debounceDelay(0), m_switchWhen(switchWhen) {
+      m_debounceDelay(0), m_switchWhen(switchWhen), m_lastState(LOW) {
   begin();
 }
 
 Toggle::Toggle(uint8_t pin, long dTime)
     : m_pin(pin), m_toggleState(false), m_lastDebounce(millis()),
-      m_debounceDelay(dTime), m_switchWhen(ToggleWhen::high) {
+      m_debounceDelay(dTime), m_switchWhen(ToggleWhen::high), m_lastState(LOW) {
   begin();
 }
 
 Toggle::Toggle(uint8_t pin, ToggleWhen switchWhen, long dTime)
     : m_pin(pin), m_toggleState(false), m_lastDebounce(millis()),
-      m_debounceDelay(dTime), m_switchWhen(switchWhen) {
+      m_debounceDelay(dTime), m_switchWhen(switchWhen), m_lastState(LOW) {
   begin();
 }
 
@@ -152,13 +153,12 @@ bool Toggle::isToggled() {
   // reference for debounce code
   // https://docs.arduino.cc/built-in-examples/digital/Debounce
 
-  static int lastState;
   int newState = digitalRead(m_pin);
   long now = millis();
-  if (lastState != newState) {
+  if (m_lastState != newState) {
     m_lastDebounce = now;
   }
-  lastState = newState;
+  m_lastState = newState;
   if (now - m_lastDebounce > m_debounceDelay) {
     bool changed = m_switchState != newState;
     m_switchState = newState;
@@ -166,8 +166,8 @@ bool Toggle::isToggled() {
       m_toggleState = !m_toggleState;
       return true;
     }
-    return false;
   }
+  return false;
 }
 
 bool Toggle::isHigh() const { return m_switchState == HIGH; }
