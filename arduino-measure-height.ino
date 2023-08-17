@@ -2,6 +2,17 @@
 #include "Toggle.hpp"
 #include "Ultrasonic.hpp"
 
+/*
+nano:
+- SDA: A4
+- SCL: A5
+*/
+
+constexpr int DEBOUNCE_DELAY = 20; // ms
+constexpr int TOGGLE_PIN = 4;
+constexpr int TRIG_PIN = 7;
+constexpr int ECHO_PIN = 8;
+
 oled_ssd1306::SSD1306_Writer screen(2);
 
 void setup() {
@@ -15,8 +26,8 @@ void loop() {
   long currentTime = millis();
 
   static int unitIndex = 0;
-  static Toggle unitToggle(4, 20);
-  static UltrasonicSensor ultrasonic(7, 8, DistUnit::CENTIMETERS);
+  static Toggle unitToggle(TOGGLE_PIN, DEBOUNCE_DELAY);
+  static UltrasonicSensor ultrasonic(TRIG_PIN, ECHO_PIN, DistUnit::CENTIMETERS);
 
   if (unitToggle.isToggled()) {
     unitIndex = (unitIndex + 1) % 3;
